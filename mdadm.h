@@ -231,7 +231,8 @@ extern int same_uuid(int a[4], int b[4]);
 extern int compare_super(mdp_super_t *first, mdp_super_t *second);
 extern unsigned long calc_sb_csum(mdp_super_t *super);
 extern int store_super(int fd, mdp_super_t *super);
-extern int enough(int level, int raid_disks, int avail_disks);
+extern int enough(int level, int raid_disks, int layout,
+		   char *avail, int avail_disks);
 extern int ask(char *mesg);
 
 

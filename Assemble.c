@@ -119,6 +119,7 @@ int Assemble(char *mddev, int mdfd,
 	int start_partial_ok = force || devlist==NULL;
 	unsigned int num_devs;
 	mddev_dev_t tmpdev;
+	char *avail;
 	
 	vers = md_get_version(mdfd);
 	if (vers <= 0) {
@@ -389,6 +390,8 @@ int Assemble(char *mddev, int mdfd,
 	/* now we have some devices that might be suitable.
 	 * I wonder how many
 	 */
+	avail = malloc(first_super.raid_disks);
+	memset(avail, 0, first_super.raid_disks);
 	okcnt = 0;
 	sparecnt=0;
 	for (i=0; i< bestcnt ;i++) {
@@ -407,13 +410,16 @@ int Assemble(char *mddev, int mdfd,
 		if (devices[j].events+event_margin >=
 		    devices[most_recent].events) {
 			devices[j].uptodate = 1;
-			if (i < first_super.raid_disks)
+			if (i < first_super.raid_disks) {
 				okcnt++;
-			else
+				avail[i]=1;
+			} else
 				sparecnt++;
 		}
 	}
-	while (force && !enough(first_super.level, first_super.raid_disks, okcnt)) {
+	while (force && !enough(first_super.level, first_super.raid_disks,
+				first_super.layout,
+				avail, okcnt)) {
 		/* Choose the newest best drive which is
 		 * not up-to-date, update the superblock
 		 * and add it.
@@ -466,6 +472,7 @@ int Assemble(char *mddev, int mdfd,
 		close(fd);
 		devices[chosen_drive].events = devices[most_recent].events;
 		devices[chosen_drive].uptodate = 1;
+		avail[chosen_drive] = 1;
 		okcnt++;
 	}
 
@@ -624,7 +631,7 @@ This doesnt work yet
 		
 		if (runstop == 1 ||
 		    (runstop == 0 && 
-		     ( enough(first_super.level, first_super.raid_disks, okcnt) &&
+		     ( enough(first_super.level, first_super.raid_disks, first_super.layout, avail, okcnt) &&
 		       (okcnt >= req_cnt || start_partial_ok)
 			     ))) {
 			if (ioctl(mdfd, RUN_ARRAY, NULL)==0) {
@@ -649,7 +656,7 @@ This doesnt work yet
 		fprintf(stderr, Name ": %s assembled from %d drive%s", mddev, okcnt, okcnt==1?"":"s");
 		if (sparecnt)
 			fprintf(stderr, " and %d spare%s", sparecnt, sparecnt==1?"":"s");
-		if (!enough(first_super.level, first_super.raid_disks, okcnt))
+		if (!enough(first_super.level, first_super.raid_disks, first_super.layout, avail, okcnt))
 			fprintf(stderr, " - not enough to start the array.\n");
 		else {
 			if (req_cnt == first_super.raid_disks)
