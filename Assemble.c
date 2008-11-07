@@ -1251,8 +1251,10 @@ int assemble_container_content(struct supertype *st, int mdfd,
 				fprintf(stderr, " (%d new)", working);
 			fprintf(stderr, "\n");
 		}
-		wait_for(chosen_name);
 		close(mdfd);
+		wait_for(chosen_name);
+		if (st->ss->match_metadata_desc("imsm"))
+			run_kpartx('a', chosen_name);
 		return 0;
 		/* FIXME should have an O_EXCL and wait for read-auto */
 	} else {

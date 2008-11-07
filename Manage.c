@@ -219,8 +219,12 @@ int Manage_runstop(char *devname, int fd, int runstop, int quiet)
 		if (mdi &&
 		    mdi->array.level > 0 &&
 		    is_subarray(mdi->text_version)) {
+			struct map_ent *me = map_by_devnum(&map, devnum);
 			/* This is mdmon managed. */
 			close(fd);
+			
+			/* Delete any kpartx partitions */
+			run_kpartx('d', me->path);
 			if (sysfs_set_str(mdi, NULL,
 					  "array_state", "inactive") < 0) {
 				if (quiet == 0)

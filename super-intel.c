@@ -636,7 +636,7 @@ static void brief_examine_super_imsm(struct supertype *st)
 		getinfo_super_imsm(st, &info);
 		fname_from_uuid(st, &info, nbuf1,'-');
 		printf("ARRAY /dev/md/%.16s container=%s\n"
-		       "   member=%d auto=mdp UUID=%s\n",
+		       "   member=%d auto=md UUID=%s\n",
 		       dev->volume, nbuf + 5, i, nbuf1 + 5);
 	}
 }

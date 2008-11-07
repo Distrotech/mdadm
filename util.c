@@ -1327,6 +1327,31 @@ void append_metadata_update(struct supertype *st, void *buf, int len)
 }
 #endif /* MDASSEMBLE */
 
+void run_kpartx(char mode, char *dev)
+{
+	char buf[1024];
+	char *cp;
+
+	sprintf(buf, "/sbin/kpartx > /dev/null 2>&1 -%c '", mode);
+
+	cp = buf + strlen(buf);
+	while (cp < buf+sizeof(buf)-10 &&
+	       *dev) {
+		if (*dev == '\'') {
+			*cp++ = '\'';
+			*cp++ = '\\';
+			*cp++ = '\'';
+			/* *cp++ = '\''; */
+		}
+		*cp ++ = *dev++;
+	}
+	*cp++ = '\'';
+	*cp++ = 0;
+	system(buf);
+}
+	
+
+
 #ifdef __TINYC__
 /* tinyc doesn't optimize this check in ioctl.h out ... */
 unsigned int __invalid_size_argument_for_IOC = 0;

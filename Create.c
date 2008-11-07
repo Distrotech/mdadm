@@ -780,7 +780,10 @@ int Create(struct supertype *st, char *mddev,
 			ping_monitor(devnum2devname(st->container_dev));
 			close(container_fd);
 		}
+		close(mdfd);
 		wait_for(chosen_name);
+		if (st->ss->match_metadata_desc("imsm"))
+			run_kpartx('a', chosen_name);
 	} else {
 		fprintf(stderr, Name ": not starting array - not enough devices.\n");
 	}

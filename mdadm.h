@@ -833,6 +833,7 @@ extern char *devnum2devname(int num);
 extern int devname2devnum(char *name);
 extern int stat2devnum(struct stat *st);
 extern int fd2devnum(int fd);
+extern void run_kpartx(char mode, char *dev);
 
 static inline int dev2major(int d)
 {
