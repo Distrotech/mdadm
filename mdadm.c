@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 
 	int chunk = 0;
 	long long size = -1;
+	unsigned long reserve_space = 0;
 	int level = UnSet;
 	int layout = UnSet;
 	int raiddisks = 0;
@@ -862,6 +863,27 @@ int main(int argc, char *argv[])
 		case O(INCREMENTAL, 'r'):
 			rebuild_map = 1;
 			continue;
+
+		case O(CREATE, ReserveSpace):
+			reserve_space = strtoul(optarg, &c, 10)*2;
+			if (reserve_space > 0) {
+				switch (*c++) {
+				default: c--; break;
+				case 'K': break;
+				case 'M':
+					reserve_space <<= 10;
+					break;
+				case 'G':
+					reserve_space <<= 20;
+					break;
+				}
+			}
+			if (reserve_space == 0 || *c) {
+				fprintf(stderr, Name ": Invalid value for reserve-space: %s\n",
+					optarg);
+				exit(2);
+			}
+			continue;
 		}
 		/* We have now processed all the valid options. Anything else is
 		 * an error
@@ -1182,7 +1204,8 @@ int main(int argc, char *argv[])
 			    raiddisks, sparedisks, ident.name, homehost,
 			    ident.uuid_set ? ident.uuid : NULL,
 			    devs_found-1, devlist->next, runstop, verbose-quiet, force, assume_clean,
-			    bitmap_file, bitmap_chunk, write_behind, delay);
+			    bitmap_file, bitmap_chunk, write_behind, delay,
+			    reserve_space);
 		break;
 	case MISC:
 		if (devmode == 'E') {

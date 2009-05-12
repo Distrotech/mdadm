@@ -549,13 +549,20 @@ static int update_super0(struct supertype *st, struct mdinfo *info,
 
 static int init_super0(struct supertype *st, mdu_array_info_t *info,
 		       unsigned long long size, char *ignored_name, char *homehost,
-		       int *uuid)
+		       int *uuid, unsigned long reserve_space)
 {
 	mdp_super_t *sb = malloc(MD_SB_BYTES + sizeof(bitmap_super_t));
 	int spares;
 	memset(sb, 0, MD_SB_BYTES + sizeof(bitmap_super_t));
 
 	st->sb = sb;
+	if (reserve_space) {
+		/* impossible - should already have been caught
+		 * by avail_size
+		 */
+		return 0;
+	}
+
 	if (info->major_version == -1) {
 		/* zeroing the superblock */
 		return 0;
@@ -869,8 +876,14 @@ static struct supertype *match_metadata_desc0(char *arg)
 	return NULL;
 }
 
-static __u64 avail_size0(struct supertype *st, __u64 devsize)
+static __u64 avail_size0(struct supertype *st, __u64 devsize,
+			 unsigned long reserve_space)
 {
+	if (reserve_space) {
+		fprintf(stderr, Name ": --reserve-space is not supported v0.90 metadata.\n"
+			"        use e.g. --metadata=1.0\n");
+		return 0ULL;
+	}
 	if (devsize < MD_RESERVED_SECTORS)
 		return 0ULL;
 	return MD_NEW_SIZE_SECTORS(devsize);

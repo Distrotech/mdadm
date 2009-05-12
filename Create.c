@@ -37,7 +37,8 @@ int Create(struct supertype *st, char *mddev, int mdfd,
 	   char *name, char *homehost, int *uuid,
 	   int subdevs, mddev_dev_t devlist,
 	   int runstop, int verbose, int force, int assume_clean,
-	   char *bitmap_file, int bitmap_chunk, int write_behind, int delay)
+	   char *bitmap_file, int bitmap_chunk, int write_behind, int delay,
+	   unsigned long reserve_space)
 {
 	/*
 	 * Create a new raid array.
@@ -235,7 +236,8 @@ int Create(struct supertype *st, char *mddev, int mdfd,
 			 */
 			int i;
 			char *name = "default";
-			if (level >= 1 && ldsize > (0x7fffffffULL<<10))
+			if (reserve_space ||
+			    (level >= 1 && ldsize > (0x7fffffffULL<<10)))
 				name = "default/large";
 			for(i=0; !st && superlist[i]; i++)
 				st = superlist[i]->match_metadata_desc(name);
@@ -251,7 +253,7 @@ int Create(struct supertype *st, char *mddev, int mdfd,
 					st->ss->major,
 					st->minor_version);
 		}
-		freesize = st->ss->avail_size(st, ldsize >> 9);
+		freesize = st->ss->avail_size(st, ldsize >> 9, reserve_space);
 		if (freesize == 0) {
 			fprintf(stderr, Name ": %s is too small: %luK\n",
 				dname, (unsigned long)(ldsize>>10));
@@ -450,7 +452,8 @@ int Create(struct supertype *st, char *mddev, int mdfd,
 				name += 2;
 		}
 	}
-	if (!st->ss->init_super(st, &info.array, size, name, homehost, uuid))
+	if (!st->ss->init_super(st, &info.array, size, name, homehost, 
+				uuid, reserve_space))
 		return 1;
 
 	if (bitmap_file && vers < 9003) {

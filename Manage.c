@@ -384,7 +384,7 @@ int Manage_subdevs(char *devname, int fd,
 				}
 
 				/* Make sure device is large enough */
-				if (tst->ss->avail_size(tst, ldsize/512) <
+				if (tst->ss->avail_size(tst, ldsize/512, 0) <
 				    array_size) {
 					fprintf(stderr, Name ": %s not large enough to join array\n",
 						dv->devname);

@@ -189,6 +189,7 @@ enum special_options {
 	AutoHomeHost,
 	Symlinks,
 	AutoDetect,
+	ReserveSpace,
 };
 
 /* structures read from config file */
@@ -343,7 +344,8 @@ extern struct superswitch {
 			    int uuid_set, char *homehost);
 	int (*init_super)(struct supertype *st, mdu_array_info_t *info,
 			  unsigned long long size, char *name,
-			  char *homehost, int *uuid);
+			  char *homehost, int *uuid,
+			  unsigned long reserve_space);
 	void (*add_to_super)(struct supertype *st, mdu_disk_info_t *dinfo);
 	int (*store_super)(struct supertype *st, int fd);
 	int (*write_init_super)(struct supertype *st, mdu_disk_info_t *dinfo,
@@ -351,7 +353,8 @@ extern struct superswitch {
 	int (*compare_super)(struct supertype *st, struct supertype *tst);
 	int (*load_super)(struct supertype *st, int fd, char *devname);
 	struct supertype * (*match_metadata_desc)(char *arg);
-	__u64 (*avail_size)(struct supertype *st, __u64 size);
+	__u64 (*avail_size)(struct supertype *st, __u64 size,
+			    unsigned long reserve_space);
 	int (*add_internal_bitmap)(struct supertype *st, int *chunkp,
 				   int delay, int write_behind,
 				   unsigned long long size, int may_change, int major);
@@ -452,7 +455,8 @@ extern int Create(struct supertype *st, char *mddev, int mdfd,
 		  char *name, char *homehost, int *uuid,
 		  int subdevs, mddev_dev_t devlist,
 		  int runstop, int verbose, int force, int assume_clean,
-		  char *bitmap_file, int bitmap_chunk, int write_behind, int delay);
+		  char *bitmap_file, int bitmap_chunk, int write_behind, int delay,
+		  unsigned long reserve_space);
 
 extern int Detail(char *dev, int brief, int export, int test, char *homehost);
 extern int Query(char *dev);

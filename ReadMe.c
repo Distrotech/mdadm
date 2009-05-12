@@ -140,6 +140,7 @@ struct option long_options[] = {
     {"homehost",  1, 0,  HomeHost},
     {"auto-update-homehost", 0, 0, AutoHomeHost},
     {"symlinks",  1, 0,  Symlinks},
+    {"reserve-space", 1, 0, ReserveSpace},
 
     /* For assemble */
     {"uuid",      1, 0, 'u'},

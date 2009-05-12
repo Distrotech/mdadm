@@ -312,7 +312,7 @@ int Grow_addbitmap(char *devname, int fd, char *file, int chunk, int delay, int 
 						)
 						st->ss->write_bitmap(st, fd2);
 					else {
-						fprintf(stderr, Name ": failed to create internal bitmap - chunksize problem.\n");
+						fprintf(stderr, Name ": failed to create internal bitmap.\n");
 						close(fd2);
 						return 1;
 					}
