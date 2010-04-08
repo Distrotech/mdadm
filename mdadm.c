@@ -774,6 +774,9 @@ int main(int argc, char *argv[])
 			devmode = 'r';
 			continue;
 		case O(MANAGE,'f'): /* set faulty */
+		case O(INCREMENTAL,'f'): /* r for incremental is taken, use f
+					  * even though we will both fail and
+					  * remove the device */
 			devmode = 'f';
 			continue;
 		case O(INCREMENTAL,'R'):
@@ -1517,6 +1520,11 @@ int main(int argc, char *argv[])
 			 ": --incremental --scan meaningless without --run.\n");
 				break;
 			}
+			if (devmode == 'f') {
+				fprintf(stderr, Name
+			 ": --incremental --scan --fail not supported.\n");
+				break;
+			}
 			rv = IncrementalScan(verbose);
 		}
 		if (!devlist) {
@@ -1531,6 +1539,10 @@ int main(int argc, char *argv[])
 			fprintf(stderr, Name
 			       ": --incremental can only handle one device.\n");
 			rv = 1;
+			break;
+		}
+		if (devmode == 'f') {
+			rv = IncrementalRemove(devlist->devname, verbose-quiet);
 			break;
 		}
 		rv = Incremental(devlist->devname, verbose-quiet, runstop,
