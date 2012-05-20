@@ -1234,10 +1234,14 @@ static int write_init_super1(struct supertype *st)
 		/* We try to leave 0.1% at the start for reshape
 		 * operations, but limit this to 128Meg (0.1% of 10Gig)
 		 * which is plenty for efficient reshapes
+		 * However we make it at least 2 chunks as one chunk
+		 * is minimum needed for reshape.
 		 */
 		headroom = 128 * 1024 * 2;
-		while  (headroom << 10 > array_size)
+		while  (headroom << 10 > array_size &&
+			headroom/2 >= __le32_to_cpu(sb->chunksize) * 2)
 			headroom >>= 1;
+
 
 		switch(st->minor_version) {
 		case 0:
@@ -1574,8 +1578,8 @@ static struct supertype *match_metadata_desc1(char *arg)
  * superblock type st, and reserving 'reserve' sectors for
  * a possible bitmap
  */
-static __u64 avail_size1(struct supertype *st, __u64 devsize,
-			 long long data_offset)
+static __u64 _avail_size1(struct supertype *st, __u64 devsize,
+			 long long data_offset, int chunksize)
 {
 	struct mdp_superblock_1 *super = st->sb;
 	int bmspace = 0;
@@ -1618,7 +1622,9 @@ static __u64 avail_size1(struct supertype *st, __u64 devsize,
 		 * Limit slack to 128M, but aim for about 0.1%
 		 */
 		unsigned long long headroom = 128*1024*2;
-		while ((headroom << 10) > devsize)
+		while ((headroom << 10) > devsize &&
+		       (chunksize == 0 ||
+			headroom / 2 >= ((unsigned)chunksize*2)*2))
 			headroom >>= 1;
 		devsize -= headroom;
 	}
@@ -1634,6 +1640,11 @@ static __u64 avail_size1(struct supertype *st, __u64 devsize,
 		return devsize - (4+4)*2;
 	}
 	return 0;
+}
+static __u64 avail_size1(struct supertype *st, __u64 devsize,
+			 long long data_offset)
+{
+	return _avail_size1(st, devsize, data_offset, 0);
 }
 
 static int
@@ -1875,7 +1886,7 @@ static int validate_geometry1(struct supertype *st, int level,
 	}
 	close(fd);
 
-	*freesize = avail_size1(st, ldsize >> 9, data_offset);
+	*freesize = _avail_size1(st, ldsize >> 9, data_offset, *chunk);
 	return 1;
 }
 #endif /* MDASSEMBLE */
