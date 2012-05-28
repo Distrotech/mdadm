@@ -1162,7 +1162,7 @@ static int write_init_super1(struct supertype *st)
 	unsigned long long sb_offset, headroom;
 	long long data_offset;
 
-	for (di = st->info; di && ! rv ; di = di->next) {
+	for (di = st->info; di; di = di->next) {
 		if (di->disk.state == 1)
 			continue;
 		if (di->fd < 0)
@@ -1321,6 +1321,8 @@ static int write_init_super1(struct supertype *st)
 			rv = st->ss->write_bitmap(st, di->fd);
 		close(di->fd);
 		di->fd = -1;
+		if (rv)
+			goto error_out;
 	}
 error_out:
 	if (rv)
