@@ -389,6 +389,7 @@ struct mddev_dev {
 	char writemostly;	/* 1 for 'set writemostly', 2 for 'clear writemostly' */
 	char re_add;
 	char used;		/* set when used */
+	long long data_offset;
 	struct mddev_dev *next;
 };
 
@@ -696,7 +697,7 @@ extern struct superswitch {
 	 * when hot-adding a spare.
 	 */
 	int (*add_to_super)(struct supertype *st, mdu_disk_info_t *dinfo,
-			    int fd, char *devname);
+			    int fd, char *devname, long long data_offset);
 	/* update the metadata to delete a device,
 	 * when hot-removing.
 	 */

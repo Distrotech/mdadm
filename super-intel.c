@@ -4945,7 +4945,7 @@ int mark_spare(struct dl *disk)
 }
 
 static int add_to_super_imsm(struct supertype *st, mdu_disk_info_t *dk,
-			     int fd, char *devname)
+			     int fd, char *devname, long long data_offset)
 {
 	struct intel_super *super = st->sb;
 	struct dl *dd;

@@ -213,6 +213,9 @@ long long parse_size(char *size)
 			c++;
 			s *= 1024 * 1024 * 2;
 			break;
+		case 's': /* sectors */
+			c++;
+			break;
 		}
 	}
 	if (*c)

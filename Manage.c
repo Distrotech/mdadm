@@ -945,7 +945,7 @@ int Manage_subdevs(char *devname, int fd,
 					disc.state |= 1 << MD_DISK_WRITEMOSTLY;
 				dfd = dev_open(dv->devname, O_RDWR | O_EXCL|O_DIRECT);
 				if (tst->ss->add_to_super(tst, &disc, dfd,
-							  dv->devname)) {
+							  dv->devname, -1)) {
 					close(dfd);
 					goto abort;
 				}
@@ -1007,7 +1007,7 @@ int Manage_subdevs(char *devname, int fd,
 				if (mdmon_running(tst->container_dev))
 					tst->update_tail = &tst->updates;
 				if (tst->ss->add_to_super(tst, &disc, dfd,
-							  dv->devname)) {
+							  dv->devname, -1)) {
 					close(dfd);
 					close(container_fd);
 					goto abort;
