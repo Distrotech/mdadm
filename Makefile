@@ -232,20 +232,20 @@ sha1.o : sha1.c sha1.h md5.h
 	$(CC) $(CFLAGS) -DHAVE_STDINT_H -o sha1.o -c sha1.c
 
 install : mdadm mdmon install-man install-udev
-	$(INSTALL) -D $(STRIP) -m 755 mdadm $(DESTDIR)$(BINDIR)/mdadm
-	$(INSTALL) -D $(STRIP) -m 755 mdmon $(DESTDIR)$(BINDIR)/mdmon
+	$(INSTALL) -D -m 755 mdadm $(DESTDIR)$(BINDIR)/mdadm
+	$(INSTALL) -D -m 755 mdmon $(DESTDIR)$(BINDIR)/mdmon
 
 install-static : mdadm.static install-man
-	$(INSTALL) -D $(STRIP) -m 755 mdadm.static $(DESTDIR)$(BINDIR)/mdadm
+	$(INSTALL) -D -m 755 mdadm.static $(DESTDIR)$(BINDIR)/mdadm
 
 install-tcc : mdadm.tcc install-man
-	$(INSTALL) -D $(STRIP) -m 755 mdadm.tcc $(DESTDIR)$(BINDIR)/mdadm
+	$(INSTALL) -D -m 755 mdadm.tcc $(DESTDIR)$(BINDIR)/mdadm
 
 install-uclibc : mdadm.uclibc install-man
-	$(INSTALL) -D $(STRIP) -m 755 mdadm.uclibc $(DESTDIR)$(BINDIR)/mdadm
+	$(INSTALL) -D -m 755 mdadm.uclibc $(DESTDIR)$(BINDIR)/mdadm
 
 install-klibc : mdadm.klibc install-man
-	$(INSTALL) -D $(STRIP) -m 755 mdadm.klibc $(DESTDIR)$(BINDIR)/mdadm
+	$(INSTALL) -D -m 755 mdadm.klibc $(DESTDIR)$(BINDIR)/mdadm
 
 install-man: mdadm.8 md.4 mdadm.conf.5 mdmon.8
 	$(INSTALL) -D -m 644 mdadm.8 $(DESTDIR)$(MAN8DIR)/mdadm.8
